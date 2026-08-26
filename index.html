@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Khatavahi">
+<meta name="theme-color" content="#2B2620">
+<title>ખાતાવહી · Khatavahi</title>
+<meta name="description" content="Your daily hisab, sorted. A ledger and loan tracker.">
+<link rel="manifest" href="manifest.json">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%232B2620'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23F7F2E7' font-family='Georgia,serif'%3E%E0%AA%96%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232B2620'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23F7F2E7' font-family='Georgia,serif'%3E%E0%AA%96%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#F7F2E7; --paper-card:#FFFDF8; --line:#E2D8BE; --line-soft:#EADFC4;
+    --ink:#2B2620; --ink-muted:#6B6355; --ink-faint:#8A7F68;
+    --red:#A63D40; --green:#3F6B4F; --gold:#B08D3E;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; background:var(--paper); color:var(--ink);
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  body{
+    background-image:repeating-linear-gradient(var(--paper) 0px, var(--paper) 27px, var(--line-soft) 28px);
+    padding-bottom:100px;
+    min-height:100vh;
+    padding-top:env(safe-area-inset-top);
+  }
+  button,input,select{font-family:inherit;}
+  button{cursor:pointer;}
+  input:focus,select:focus,button:focus-visible{outline:2px solid var(--gold); outline-offset:1px;}
+  .mono{font-family:ui-monospace,'SF Mono',Menlo,monospace; font-variant-numeric:tabular-nums;}
+  .hidden{display:none !important;}
+
+  header{padding:28px 20px 14px; border-bottom:2px solid var(--gold); display:flex; justify-content:space-between; align-items:flex-start;}
+  .title-row{display:flex; align-items:baseline; gap:10px;}
+  .title-gu{font-size:26px; font-weight:700; letter-spacing:.5px;}
+  .title-en{font-size:12px; color:var(--ink-faint); font-weight:600; letter-spacing:.5px; text-transform:uppercase;}
+  .subtitle{font-size:13px; color:var(--ink-muted); margin-top:4px;}
+  .menu-btn{background:transparent; border:1px solid var(--line); border-radius:8px; padding:8px; display:flex; color:var(--ink-muted);}
+  .menu-btn svg{width:16px; height:16px;}
+
+  .tabs{display:flex; gap:6px; padding:14px 20px 0;}
+  .tab{flex:1; padding:9px 0; border-radius:8px; border:1px solid var(--line); background:var(--paper-card);
+    color:var(--ink-muted); font-size:13px; font-weight:600; text-align:center;}
+  .tab.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+
+  .install-banner{margin:16px 20px 0; padding:12px 14px; background:#FBF3DE; border:1px solid var(--gold);
+    border-radius:8px; font-size:12.5px; color:var(--ink); display:none;}
+  .install-banner.show{display:block;}
+  .install-banner b{display:block; margin-bottom:2px;}
+
+  .summary-card{margin:16px 20px; background:var(--paper-card); border:1px solid var(--line);
+    border-radius:10px; padding:18px 20px; box-shadow:0 1px 0 var(--line);}
+  .balance-label{font-size:12px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.6px; margin-bottom:4px;}
+  .balance-value{font-size:34px; font-weight:700;}
+  .inout-row{display:flex; gap:24px; border-top:1px dashed var(--line); padding-top:12px; margin-top:14px; flex-wrap:wrap;}
+  .inout-item{display:flex; align-items:center; gap:6px;}
+  .dot{width:7px; height:7px; border-radius:50%; flex-shrink:0;}
+  .inout-label{font-size:12px; color:var(--ink-muted);}
+  .inout-value{font-size:14px; font-weight:600;}
+
+  .filter-row{display:flex; gap:6px; padding:4px 20px 10px;}
+  .filter-chip{flex:1; padding:7px 0; border-radius:20px; border:1px solid var(--line); background:var(--paper-card);
+    color:var(--ink-muted); font-size:12px; font-weight:600; text-align:center;}
+  .filter-chip.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  .filter-chip.active.f-income{background:var(--green); border-color:var(--green);}
+  .filter-chip.active.f-expense{background:var(--red); border-color:var(--red);}
+  .filter-chip.active.f-lent{background:var(--green); border-color:var(--green);}
+  .filter-chip.active.f-borrowed{background:var(--red); border-color:var(--red);}
+  .quick-section{padding:4px 20px 8px;}
+  .quick-label{font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.6px; margin-bottom:8px;}
+  .quick-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .quick-chip{background:var(--paper-card); border:1px solid var(--line); border-radius:8px; padding:7px 12px;
+    display:flex; flex-direction:column; align-items:flex-start; line-height:1.3; min-width:66px;}
+  .quick-chip .gu{font-size:13px; font-weight:600; color:var(--ink);}
+  .quick-chip .en{font-size:10px; color:var(--ink-faint);}
+
+  .empty-state{margin:24px 20px; padding:28px 20px; text-align:center; color:var(--ink-faint);
+    font-size:13.5px; background:var(--paper-card); border:1px dashed var(--line); border-radius:10px;}
+
+  .ledger{padding:8px 20px 0;}
+  .day-block, .group-block{margin-bottom:18px;}
+  .day-label, .group-label{font-size:11.5px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:.6px;
+    margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between;}
+  .row{display:flex; align-items:center; padding:8px 0; border-bottom:1px solid var(--line-soft); gap:8px;}
+  .row.settled{opacity:.45;}
+  .row-left{flex:1; min-width:0;}
+  .row-category{font-size:14px; font-weight:600;}
+  .row-desc{font-size:12px; color:var(--ink-faint); margin-top:1px;}
+  .row-right{text-align:right; min-width:92px;}
+  .row-amount{font-size:14.5px; font-weight:700;}
+  .row-balance{font-size:11px; color:var(--ink-faint); margin-top:1px;}
+  .row-actions{display:flex; gap:2px; margin-left:2px; flex-shrink:0;}
+  .icon-btn-sm{background:transparent; border:none; color:var(--ink-faint); padding:5px; border-radius:6px; display:flex;}
+  .icon-btn-sm svg{width:14px; height:14px;}
+  .pill-btn{border:1px solid var(--line); background:#fff; color:var(--ink-muted); font-size:10.5px; border-radius:12px; padding:3px 8px; margin-left:4px; white-space:nowrap;}
+  .pill-btn.settle{border-color:var(--green); color:var(--green);}
+
+  .loan-summary-row{display:flex; gap:24px; flex-wrap:wrap;}
+  .cash-card{border-color:var(--gold); border-width:2px;}
+  .cash-breakdown{font-size:11.5px; color:var(--ink-faint); margin-top:8px; border-top:1px dashed var(--line); padding-top:10px; line-height:1.6;}
+  .no-cash-tag{font-size:9.5px; color:var(--ink-faint); border:1px solid var(--line); border-radius:8px; padding:1px 6px; margin-left:6px; text-transform:uppercase; letter-spacing:.3px;}
+  .cash-checkbox-row{display:flex; align-items:flex-start; gap:8px; margin-top:14px;}
+  .cash-checkbox-row input{width:17px; height:17px; margin-top:1px; flex-shrink:0;}
+  .cash-checkbox-row .cc-text{font-size:13px; color:var(--ink);}
+  .cash-checkbox-row .cc-sub{font-size:11px; color:var(--ink-faint); margin-top:2px;}
+
+  .reset-row{padding:16px 20px 0; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;}
+  .reset-btn{background:transparent; border:1px solid var(--line); color:var(--ink-faint); font-size:11.5px;
+    border-radius:20px; padding:6px 14px; display:flex; align-items:center; gap:6px;}
+  .confirm-row{display:flex; align-items:center; gap:8px; font-size:12.5px; flex-wrap:wrap; justify-content:center;}
+  .confirm-yes{background:var(--red); color:#fff; border:none; border-radius:6px; padding:5px 10px; font-size:12px;}
+  .confirm-no{background:transparent; border:1px solid var(--line); border-radius:6px; padding:5px 10px; font-size:12px; color:var(--ink-muted);}
+
+  .fab{position:fixed; bottom:calc(24px + env(safe-area-inset-bottom)); right:20px; width:54px; height:54px;
+    border-radius:50%; background:var(--ink); color:var(--paper); border:none; display:flex;
+    align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(43,38,32,.35); z-index:5;}
+  .fab svg{width:24px; height:24px;}
+
+  .overlay{position:fixed; inset:0; background:rgba(43,38,32,.45); display:none; align-items:flex-end;
+    justify-content:center; z-index:10;}
+  .overlay.open{display:flex;}
+  .sheet{background:var(--paper-card); width:100%; max-width:480px; border-radius:16px 16px 0 0;
+    padding:18px 20px calc(26px + env(safe-area-inset-bottom)); max-height:88vh; overflow-y:auto;}
+  .sheet-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .sheet-title{font-size:16px; font-weight:700;}
+
+  .type-toggle{display:flex; gap:8px; margin-bottom:16px;}
+  .type-btn{flex:1; padding:9px 0; border-radius:8px; border:1px solid var(--line); background:var(--paper-card);
+    color:var(--ink-muted); font-size:13.5px; font-weight:600;}
+  .type-btn.active-expense, .type-btn.active-borrowed{background:var(--red); color:#fff; border-color:var(--red);}
+  .type-btn.active-income, .type-btn.active-lent{background:var(--green); color:#fff; border-color:var(--green);}
+
+  .field-label{display:block; font-size:11px; color:var(--ink-faint); text-transform:uppercase;
+    letter-spacing:.5px; margin-bottom:5px; margin-top:12px;}
+  .amount-input{width:100%; font-size:26px; font-weight:700; padding:10px 12px; border:1px solid var(--line);
+    border-radius:8px; background:#fff;}
+  select.field, input.field{width:100%; font-size:14px; padding:10px 12px; border:1px solid var(--line);
+    border-radius:8px; background:#fff; color:var(--ink);}
+
+  .save-btn{width:100%; margin-top:20px; background:var(--ink); color:var(--paper); border:none; border-radius:10px;
+    padding:13px 0; font-size:14.5px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px;}
+  .save-btn svg{width:16px; height:16px; flex-shrink:0;}
+  .save-btn:disabled{opacity:.5;}
+  .helper-text{font-size:11.5px; color:var(--ink-faint); margin-top:6px;}
+
+  .menu-sheet-item{width:100%; text-align:left; background:transparent; border:none; padding:12px 4px;
+    font-size:14px; color:var(--ink); border-bottom:1px solid var(--line-soft); display:flex; align-items:center; gap:10px;}
+  .menu-sheet-item:last-child{border-bottom:none;}
+  .menu-sheet-item svg{width:16px; height:16px; color:var(--ink-faint); flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="title-row">
+      <span class="title-gu">ખાતાવહી</span>
+      <span class="title-en">Khatavahi</span>
+    </div>
+    <div class="subtitle">Your daily hisab, sorted.</div>
+  </div>
+  <button class="menu-btn" onclick="openMenu()" aria-label="Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+  </button>
+</header>
+
+<div class="tabs">
+  <button class="tab active" id="tabLedgerBtn" onclick="switchTab('ledger')">Ledger</button>
+  <button class="tab" id="tabLoansBtn" onclick="switchTab('loans')">Loans · લોન</button>
+</div>
+
+<div id="installBanner" class="install-banner">
+  <b>Tip: add this to your home screen</b>
+  <span id="installText"></span>
+</div>
+
+<section class="summary-card cash-card">
+  <div class="balance-label">Cash in hand</div>
+  <div id="cashValue" class="balance-value mono">₹0</div>
+  <div class="cash-breakdown" id="cashBreakdown"></div>
+</section>
+
+<!-- LEDGER VIEW -->
+<div id="ledgerView">
+  <section class="summary-card">
+    <div class="balance-label">Balance</div>
+    <div id="balanceValue" class="balance-value mono">₹0</div>
+    <div class="inout-row">
+      <div class="inout-item"><div class="dot" style="background:var(--green)"></div><span class="inout-label">In</span><span id="totalIn" class="inout-value mono" style="color:var(--green)">₹0</span></div>
+      <div class="inout-item"><div class="dot" style="background:var(--red)"></div><span class="inout-label">Out</span><span id="totalOut" class="inout-value mono" style="color:var(--red)">₹0</span></div>
+    </div>
+  </section>
+
+  <section class="quick-section">
+    <div class="quick-label">Quick add</div>
+    <div class="quick-row" id="quickRow"></div>
+  </section>
+
+  <div class="filter-row">
+    <button class="filter-chip active" id="fltAll" onclick="setLedgerFilter('all')">All</button>
+    <button class="filter-chip f-income" id="fltIncome" onclick="setLedgerFilter('income')">Income</button>
+    <button class="filter-chip f-expense" id="fltExpense" onclick="setLedgerFilter('expense')">Expense</button>
+  </div>
+
+  <div id="ledgerArea"></div>
+
+  <div class="reset-row" id="resetRowLedger" style="display:none;">
+    <div id="resetControlsLedger"></div>
+  </div>
+</div>
+
+<!-- LOANS VIEW -->
+<div id="loansView" class="hidden">
+  <section class="summary-card">
+    <div class="balance-label">Net loan position</div>
+    <div id="loanNetValue" class="balance-value mono">₹0</div>
+    <div class="inout-row loan-summary-row">
+      <div class="inout-item"><div class="dot" style="background:var(--red)"></div><span class="inout-label">You owe</span><span id="totalOwe" class="inout-value mono" style="color:var(--red)">₹0</span></div>
+      <div class="inout-item"><div class="dot" style="background:var(--green)"></div><span class="inout-label">Owed to you</span><span id="totalOwed" class="inout-value mono" style="color:var(--green)">₹0</span></div>
+    </div>
+  </section>
+
+  <div class="filter-row">
+    <button class="filter-chip active" id="fltLoanAll" onclick="setLoanFilter('all')">All</button>
+    <button class="filter-chip f-borrowed" id="fltBorrowed" onclick="setLoanFilter('borrowed')">You owe</button>
+    <button class="filter-chip f-lent" id="fltLent" onclick="setLoanFilter('lent')">Owed to you</button>
+  </div>
+
+  <div id="loansArea"></div>
+
+  <div class="reset-row" id="resetRowLoans" style="display:none;">
+    <div id="resetControlsLoans"></div>
+  </div>
+</div>
+
+<button class="fab" id="mainFab" onclick="handleFabClick()" aria-label="Add">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
+<!-- LEDGER ENTRY SHEET -->
+<div class="overlay" id="overlay" onclick="if(event.target===this) closeForm()">
+  <div class="sheet">
+    <div class="sheet-header">
+      <span class="sheet-title" id="sheetTitle">New entry</span>
+      <button class="icon-btn-sm" onclick="closeForm()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="type-toggle">
+      <button class="type-btn" id="btnExpense" onclick="setType('expense')">Expense</button>
+      <button class="type-btn" id="btnIncome" onclick="setType('income')">Income</button>
+    </div>
+
+    <label class="field-label">Amount</label>
+    <input class="amount-input" id="fAmount" type="number" inputmode="decimal" placeholder="0" oninput="validateForm()">
+
+    <label class="field-label">Category</label>
+    <select class="field" id="fCategory"></select>
+
+    <label class="field-label">Note (optional)</label>
+    <input class="field" id="fNote" type="text" placeholder="e.g. dhana ne bateta">
+
+    <label class="field-label">Date</label>
+    <input class="field" id="fDate" type="date">
+
+    <button class="save-btn" id="saveBtn" onclick="saveDraft()" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      <span id="saveBtnLabel">Add to ledger</span>
+    </button>
+  </div>
+</div>
+
+<!-- LOAN ENTRY SHEET -->
+<div class="overlay" id="loanOverlay" onclick="if(event.target===this) closeLoanForm()">
+  <div class="sheet">
+    <div class="sheet-header">
+      <span class="sheet-title" id="loanSheetTitle">New loan</span>
+      <button class="icon-btn-sm" onclick="closeLoanForm()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="type-toggle">
+      <button class="type-btn" id="btnBorrowed" onclick="setLoanType('borrowed')">You borrowed</button>
+      <button class="type-btn" id="btnLent" onclick="setLoanType('lent')">You gave</button>
+    </div>
+
+    <label class="field-label">Person's name</label>
+    <input class="field" id="lPerson" type="text" placeholder="e.g. Mitra, Shiva">
+
+    <label class="field-label">Amount</label>
+    <input class="amount-input" id="lAmount" type="number" inputmode="decimal" placeholder="0" oninput="validateLoanForm()">
+
+    <label class="field-label">Note (optional)</label>
+    <input class="field" id="lNote" type="text" placeholder="e.g. for petrol">
+
+    <label class="field-label">Date</label>
+    <input class="field" id="lDate" type="date">
+
+    <label class="cash-checkbox-row">
+      <input type="checkbox" id="lAffectsCash" checked onchange="">
+      <span>
+        <span class="cc-text">This changed my cash in hand today</span>
+        <span class="cc-sub">Uncheck for old debts you're just tracking (like an existing home loan) — not new money today.</span>
+      </span>
+    </label>
+
+    <button class="save-btn" id="saveLoanBtn" onclick="saveLoanDraft()" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Add loan
+    </button>
+  </div>
+</div>
+
+<!-- REPAYMENT SHEET -->
+<div class="overlay" id="repayOverlay" onclick="if(event.target===this) closeRepayForm()">
+  <div class="sheet">
+    <div class="sheet-header">
+      <span class="sheet-title">Record repayment</span>
+      <button class="icon-btn-sm" onclick="closeRepayForm()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="helper-text" id="repayRemainingText" style="margin-top:0;"></div>
+
+    <label class="field-label">Amount</label>
+    <input class="amount-input" id="rAmount" type="number" inputmode="decimal" placeholder="0" oninput="validateRepayForm()">
+
+    <label class="field-label">Date</label>
+    <input class="field" id="rDate" type="date">
+
+    <button class="save-btn" id="saveRepayBtn" onclick="saveRepayment()" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Record repayment
+    </button>
+  </div>
+</div>
+
+<!-- MENU SHEET -->
+<div class="overlay" id="menuOverlay" onclick="if(event.target===this) closeMenu()">
+  <div class="sheet">
+    <div class="sheet-header">
+      <span class="sheet-title">Menu</span>
+      <button class="icon-btn-sm" onclick="closeMenu()" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <button class="menu-sheet-item" onclick="exportBackup()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export backup
+    </button>
+    <button class="menu-sheet-item" onclick="document.getElementById('importFile').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import backup
+    </button>
+    <input type="file" id="importFile" accept="application/json" class="hidden" onchange="importBackup(event)">
+  </div>
+</div>
+
+<script>
+const LEDGER_KEY = "khatavahi-entries-v1";
+const LOANS_KEY = "khatavahi-loans-v1";
+const CATEGORY_PRESETS = ["Hapta","Life Cover","Mitra","Dudh","Nasto","Petrol","Recharge","Riksha","Bus","Gold Loan","Valuation","Gift","Salary","Savings","Other"];
+const QUICK_ADDS = [
+  {label:"દૂધ", sub:"Dudh", category:"Dudh", amount:105, type:"expense"},
+  {label:"પેટ્રોલ", sub:"Petrol", category:"Petrol", amount:200, type:"expense"},
+  {label:"રિક્ષા", sub:"Riksha", category:"Riksha", amount:30, type:"expense"},
+  {label:"બસ", sub:"Bus", category:"Bus", amount:20, type:"expense"},
+  {label:"નાસ્તો", sub:"Nasto", category:"Nasto", amount:100, type:"expense"},
+  {label:"રિચાર્જ", sub:"Recharge", category:"Recharge", amount:200, type:"expense"},
+];
+
+let entries = [];
+let loans = [];
+let editingId = null;
+let currentType = "expense";
+let currentTab = "ledger";
+let editingLoanId = null;
+let currentLoanType = "borrowed";
+let repayingLoanId = null;
+let confirmingReset = false;
+let confirmingLoanReset = false;
+let ledgerFilter = "all";
+let loanFilter = "all";
+
+function setLedgerFilter(f){
+  ledgerFilter = f;
+  document.getElementById("fltAll").className = "filter-chip" + (f==="all" ? " active" : "");
+  document.getElementById("fltIncome").className = "filter-chip f-income" + (f==="income" ? " active" : "");
+  document.getElementById("fltExpense").className = "filter-chip f-expense" + (f==="expense" ? " active" : "");
+  renderLedger();
+}
+function setLoanFilter(f){
+  loanFilter = f;
+  document.getElementById("fltLoanAll").className = "filter-chip" + (f==="all" ? " active" : "");
+  document.getElementById("fltBorrowed").className = "filter-chip f-borrowed" + (f==="borrowed" ? " active" : "");
+  document.getElementById("fltLent").className = "filter-chip f-lent" + (f==="lent" ? " active" : "");
+  renderLoans();
+}
+
+function todayISO(){
+  const d = new Date();
+  const off = d.getTimezoneOffset();
+  return new Date(d.getTime() - off*60000).toISOString().slice(0,10);
+}
+function formatINR(n){
+  const neg = n < 0;
+  const abs = Math.abs(Math.round(n));
+  return (neg?"-":"") + "₹" + abs.toLocaleString("en-IN");
+}
+function formatDateLabel(iso){
+  const d = new Date(iso+"T00:00:00");
+  return d.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});
+}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function escapeHtml(s){
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function load(){
+  try{ entries = JSON.parse(localStorage.getItem(LEDGER_KEY) || "[]"); }catch(e){ entries = []; }
+  try{ loans = JSON.parse(localStorage.getItem(LOANS_KEY) || "[]"); }catch(e){ loans = []; }
+}
+function persistLedger(){
+  try{ localStorage.setItem(LEDGER_KEY, JSON.stringify(entries)); }
+  catch(e){ alert("Could not save. Your phone storage may be full or blocked."); }
+}
+function persistLoans(){
+  try{ localStorage.setItem(LOANS_KEY, JSON.stringify(loans)); }
+  catch(e){ alert("Could not save. Your phone storage may be full or blocked."); }
+}
+
+/* ---------- TABS ---------- */
+function switchTab(tab){
+  currentTab = tab;
+  document.getElementById("tabLedgerBtn").className = "tab" + (tab==="ledger" ? " active" : "");
+  document.getElementById("tabLoansBtn").className = "tab" + (tab==="loans" ? " active" : "");
+  document.getElementById("ledgerView").classList.toggle("hidden", tab!=="ledger");
+  document.getElementById("loansView").classList.toggle("hidden", tab!=="loans");
+}
+function handleFabClick(){
+  if(currentTab === "ledger") openForm(null);
+  else openLoanForm();
+}
+
+/* ---------- LEDGER RENDER ---------- */
+function renderQuickAdds(){
+  const row = document.getElementById("quickRow");
+  row.innerHTML = "";
+  QUICK_ADDS.forEach(q=>{
+    const btn = document.createElement("button");
+    btn.className = "quick-chip";
+    btn.innerHTML = `<span class="gu">${q.label}</span><span class="en">${q.sub}</span>`;
+    btn.onclick = ()=> openForm(q);
+    row.appendChild(btn);
+  });
+}
+function computeTotals(){
+  let income=0, expense=0;
+  entries.forEach(e=>{ if(e.type==="income") income+=Number(e.amount); else expense+=Number(e.amount); });
+  return {income, expense, balance: income-expense};
+}
+function renderSummary(){
+  const t = computeTotals();
+  const bv = document.getElementById("balanceValue");
+  bv.textContent = formatINR(t.balance);
+  bv.style.color = t.balance < 0 ? "var(--red)" : "var(--ink)";
+  document.getElementById("totalIn").textContent = formatINR(t.income);
+  document.getElementById("totalOut").textContent = formatINR(t.expense);
+}
+function renderLedger(){
+  const area = document.getElementById("ledgerArea");
+  const resetRow = document.getElementById("resetRowLedger");
+
+  if(entries.length === 0){
+    area.innerHTML = `<div class="empty-state">No entries yet. Tap a quick-add above, or the + button below to write your first line.</div>`;
+    resetRow.style.display = "none";
+    return;
+  }
+  resetRow.style.display = "flex";
+  renderResetControls("resetControlsLedger", confirmingReset, "askResetLedger()", "cancelResetLedger()", "resetLedgerAll()", "Reset ledger");
+
+  const chrono = [...entries].sort((a,b)=> a.date===b.date ? a.createdAt-b.createdAt : a.date.localeCompare(b.date));
+  const balanceAfter = new Map();
+  let bal = 0;
+  chrono.forEach(e=>{
+    bal += e.type==="income" ? Number(e.amount) : -Number(e.amount);
+    balanceAfter.set(e.id, bal);
+  });
+
+  const filtered = ledgerFilter === "all" ? entries : entries.filter(e=>e.type===ledgerFilter);
+  if(filtered.length === 0){
+    area.innerHTML = `<div class="empty-state">No ${ledgerFilter} entries yet.</div>`;
+    return;
+  }
+
+  const sorted = [...filtered].sort((a,b)=> a.date===b.date ? b.createdAt-a.createdAt : b.date.localeCompare(a.date));
+  const byDate = [];
+  let currentDate = null, bucket = null;
+  sorted.forEach(e=>{
+    if(e.date !== currentDate){ currentDate = e.date; bucket = {date:e.date, items:[]}; byDate.push(bucket); }
+    bucket.items.push(e);
+  });
+
+  let html = `<div class="ledger">`;
+  byDate.forEach(day=>{
+    html += `<div class="day-block"><div class="day-label"><span>${formatDateLabel(day.date)}</span></div>`;
+    day.items.forEach(item=>{
+      const amtColor = item.type==="income" ? "var(--green)" : "var(--red)";
+      const sign = item.type==="income" ? "+" : "-";
+      const desc = (item.description && item.description !== item.category)
+        ? `<div class="row-desc">${escapeHtml(item.description)}</div>` : "";
+      html += `
+        <div class="row">
+          <div class="row-left">
+            <div class="row-category">${escapeHtml(item.category)}</div>
+            ${desc}
+          </div>
+          <div class="row-right">
+            <div class="row-amount mono" style="color:${amtColor}">${sign}${formatINR(item.amount).replace('-','')}</div>
+            <div class="row-balance mono">${formatINR(balanceAfter.get(item.id))}</div>
+          </div>
+          <div class="row-actions">
+            <button class="icon-btn-sm" onclick="openForm(null,'${item.id}')" aria-label="Edit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </button>
+            <button class="icon-btn-sm" onclick="deleteEntry('${item.id}')" aria-label="Delete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+  area.innerHTML = html;
+}
+
+/* ---------- LOANS RENDER ---------- */
+function loanRemaining(loan){
+  const paid = (loan.repayments||[]).reduce((s,r)=>s+Number(r.amount),0);
+  return Math.max(0, Number(loan.amount) - paid);
+}
+function computeLoanTotals(){
+  let owe=0, owed=0;
+  loans.forEach(l=>{
+    const rem = loanRemaining(l);
+    if(l.direction==="borrowed") owe += rem; else owed += rem;
+  });
+  return {owe, owed, net: owed-owe};
+}
+function computeCashOnHand(){
+  const t = computeTotals();
+  let loanEffect = 0;
+  loans.forEach(l=>{
+    if(l.affectsCash === false) return;
+    const rem = loanRemaining(l);
+    loanEffect += (l.direction === "borrowed") ? rem : -rem;
+  });
+  return { total: t.balance + loanEffect, ledgerPart: t.balance, loanPart: loanEffect };
+}
+function renderCashCard(){
+  const c = computeCashOnHand();
+  const cv = document.getElementById("cashValue");
+  cv.textContent = formatINR(c.total);
+  cv.style.color = c.total < 0 ? "var(--red)" : "var(--ink)";
+  document.getElementById("cashBreakdown").textContent =
+    `Ledger (income − expense): ${formatINR(c.ledgerPart)}  ·  Loans that added/took cash: ${c.loanPart >= 0 ? "+" : ""}${formatINR(c.loanPart)}`;
+}
+function renderLoanSummary(){
+  const t = computeLoanTotals();
+  const nv = document.getElementById("loanNetValue");
+  nv.textContent = formatINR(t.net);
+  nv.style.color = t.net < 0 ? "var(--red)" : "var(--ink)";
+  document.getElementById("totalOwe").textContent = formatINR(t.owe);
+  document.getElementById("totalOwed").textContent = formatINR(t.owed);
+}
+function renderLoans(){
+  const area = document.getElementById("loansArea");
+  const resetRow = document.getElementById("resetRowLoans");
+
+  if(loans.length === 0){
+    area.innerHTML = `<div class="empty-state">No loans recorded. When you borrow from someone, or give money to someone, log it here — separate from your everyday ledger.</div>`;
+    resetRow.style.display = "none";
+    return;
+  }
+  resetRow.style.display = "flex";
+  renderResetControls("resetControlsLoans", confirmingLoanReset, "askResetLoans()", "cancelResetLoans()", "resetLoansAll()", "Reset loans");
+
+  const allGroups = [
+    {key:"borrowed", title:"તમે લીધા · You owe", color:"var(--red)"},
+    {key:"lent", title:"તમે આપ્યા · Owed to you", color:"var(--green)"},
+  ];
+  const groups = loanFilter === "all" ? allGroups : allGroups.filter(g=>g.key===loanFilter);
+
+  let html = "";
+  groups.forEach(g=>{
+    const items = loans.filter(l=>l.direction===g.key)
+      .sort((a,b)=>{
+        const remA = loanRemaining(a), remB = loanRemaining(b);
+        if((remA>0) !== (remB>0)) return remA>0 ? -1 : 1;
+        return b.date.localeCompare(a.date);
+      });
+    if(items.length===0) return;
+    html += `<div class="group-block"><div class="group-label"><span>${g.title}</span></div>`;
+    items.forEach(loan=>{
+      const rem = loanRemaining(loan);
+      const settled = rem <= 0;
+      html += `
+        <div class="row ${settled ? 'settled' : ''}">
+          <div class="row-left">
+            <div class="row-category">${escapeHtml(loan.person)}${loan.affectsCash === false ? '<span class="no-cash-tag">tracked only</span>' : ''}</div>
+            <div class="row-desc">${formatDateLabel(loan.date)}${loan.note ? " · " + escapeHtml(loan.note) : ""}</div>
+          </div>
+          <div class="row-right">
+            <div class="row-amount mono" style="color:${g.color}">${formatINR(rem)}</div>
+            ${rem !== Number(loan.amount) ? `<div class="row-balance mono">of ${formatINR(loan.amount)}</div>` : ""}
+          </div>
+          <div class="row-actions">
+            ${settled ? "" : `
+              <button class="pill-btn" onclick="openRepayForm('${loan.id}')">Pay</button>
+              <button class="pill-btn settle" onclick="settleLoan('${loan.id}')">Settle</button>
+            `}
+            <button class="icon-btn-sm" onclick="deleteLoan('${loan.id}')" aria-label="Delete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  area.innerHTML = html || `<div class="empty-state">No loans recorded.</div>`;
+}
+
+function renderResetControls(elId, confirming, askFn, cancelFn, yesFn, label){
+  const el = document.getElementById(elId);
+  if(confirming){
+    el.innerHTML = `
+      <div class="confirm-row">
+        <span style="color:var(--ink-muted)">Clear all?</span>
+        <button class="confirm-yes" onclick="${yesFn}">Yes, clear</button>
+        <button class="confirm-no" onclick="${cancelFn}">Cancel</button>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <button class="reset-btn" onclick="${askFn}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        ${label}
+      </button>`;
+  }
+}
+function askResetLedger(){ confirmingReset = true; renderLedger(); }
+function cancelResetLedger(){ confirmingReset = false; renderLedger(); }
+function resetLedgerAll(){ entries = []; persistLedger(); confirmingReset = false; renderAll(); }
+function askResetLoans(){ confirmingLoanReset = true; renderLoans(); }
+function cancelResetLoans(){ confirmingLoanReset = false; renderLoans(); }
+function resetLoansAll(){ loans = []; persistLoans(); confirmingLoanReset = false; renderAll(); }
+
+function deleteEntry(id){ entries = entries.filter(e=>e.id !== id); persistLedger(); renderAll(); }
+function deleteLoan(id){ loans = loans.filter(l=>l.id !== id); persistLoans(); renderAll(); }
+
+function renderAll(){
+  renderSummary();
+  renderLedger();
+  renderLoanSummary();
+  renderLoans();
+  renderCashCard();
+}
+
+/* ---------- LEDGER FORM ---------- */
+function populateCategorySelect(){
+  const sel = document.getElementById("fCategory");
+  sel.innerHTML = "";
+  CATEGORY_PRESETS.forEach(c=>{
+    const opt = document.createElement("option");
+    opt.value = c; opt.textContent = c;
+    sel.appendChild(opt);
+  });
+}
+function setType(type){
+  currentType = type;
+  document.getElementById("btnExpense").className = "type-btn" + (type==="expense" ? " active-expense" : "");
+  document.getElementById("btnIncome").className = "type-btn" + (type==="income" ? " active-income" : "");
+}
+function openForm(prefill, editId){
+  document.getElementById("fDate").value = todayISO();
+  document.getElementById("fNote").value = "";
+  document.getElementById("fAmount").value = "";
+  populateCategorySelect();
+
+  if(editId){
+    editingId = editId;
+    const item = entries.find(e=>e.id===editId);
+    document.getElementById("sheetTitle").textContent = "Edit entry";
+    document.getElementById("saveBtnLabel").textContent = "Save changes";
+    document.getElementById("fAmount").value = item.amount;
+    document.getElementById("fCategory").value = item.category;
+    document.getElementById("fNote").value = item.description || "";
+    document.getElementById("fDate").value = item.date;
+    setType(item.type);
+  } else {
+    editingId = null;
+    document.getElementById("sheetTitle").textContent = "New entry";
+    document.getElementById("saveBtnLabel").textContent = "Add to ledger";
+    if(prefill){
+      document.getElementById("fAmount").value = prefill.amount;
+      document.getElementById("fCategory").value = prefill.category;
+      document.getElementById("fNote").value = prefill.sub;
+      setType(prefill.type);
+    } else {
+      document.getElementById("fCategory").value = "Other";
+      setType("expense");
+    }
+  }
+  validateForm();
+  document.getElementById("overlay").classList.add("open");
+  setTimeout(()=>document.getElementById("fAmount").focus(), 50);
+}
+function closeForm(){
+  document.getElementById("overlay").classList.remove("open");
+  editingId = null;
+}
+function validateForm(){
+  const amt = parseFloat(document.getElementById("fAmount").value);
+  document.getElementById("saveBtn").disabled = !(amt && amt > 0);
+}
+function saveDraft(){
+  const amt = parseFloat(document.getElementById("fAmount").value);
+  if(!amt || amt <= 0) return;
+  const draft = {
+    date: document.getElementById("fDate").value || todayISO(),
+    description: document.getElementById("fNote").value.trim(),
+    category: document.getElementById("fCategory").value,
+    amount: amt,
+    type: currentType,
+  };
+  if(editingId){
+    entries = entries.map(e=> e.id===editingId ? {...e, ...draft} : e);
+  } else {
+    entries.push({id: uid(), createdAt: Date.now(), ...draft});
+  }
+  persistLedger();
+  closeForm();
+  renderAll();
+}
+
+/* ---------- LOAN FORM ---------- */
+function setLoanType(type){
+  currentLoanType = type;
+  document.getElementById("btnBorrowed").className = "type-btn" + (type==="borrowed" ? " active-borrowed" : "");
+  document.getElementById("btnLent").className = "type-btn" + (type==="lent" ? " active-lent" : "");
+}
+function openLoanForm(){
+  editingLoanId = null;
+  document.getElementById("loanSheetTitle").textContent = "New loan";
+  document.getElementById("lPerson").value = "";
+  document.getElementById("lAmount").value = "";
+  document.getElementById("lNote").value = "";
+  document.getElementById("lDate").value = todayISO();
+  document.getElementById("lAffectsCash").checked = true;
+  setLoanType("borrowed");
+  validateLoanForm();
+  document.getElementById("loanOverlay").classList.add("open");
+  setTimeout(()=>document.getElementById("lPerson").focus(), 50);
+}
+function closeLoanForm(){
+  document.getElementById("loanOverlay").classList.remove("open");
+  editingLoanId = null;
+}
+function validateLoanForm(){
+  const amt = parseFloat(document.getElementById("lAmount").value);
+  const person = document.getElementById("lPerson").value.trim();
+  document.getElementById("saveLoanBtn").disabled = !(amt && amt > 0 && person);
+}
+document.addEventListener("input", (e)=>{
+  if(e.target && e.target.id === "lPerson") validateLoanForm();
+});
+function saveLoanDraft(){
+  const amt = parseFloat(document.getElementById("lAmount").value);
+  const person = document.getElementById("lPerson").value.trim();
+  if(!amt || amt <= 0 || !person) return;
+  const loan = {
+    id: uid(),
+    createdAt: Date.now(),
+    person,
+    amount: amt,
+    direction: currentLoanType,
+    date: document.getElementById("lDate").value || todayISO(),
+    note: document.getElementById("lNote").value.trim(),
+    affectsCash: document.getElementById("lAffectsCash").checked,
+    repayments: [],
+  };
+  loans.push(loan);
+  persistLoans();
+  closeLoanForm();
+  renderAll();
+}
+
+/* ---------- REPAYMENT FORM ---------- */
+function openRepayForm(loanId){
+  repayingLoanId = loanId;
+  const loan = loans.find(l=>l.id===loanId);
+  const rem = loanRemaining(loan);
+  document.getElementById("repayRemainingText").textContent = `${loan.person} · remaining ${formatINR(rem)}`;
+  document.getElementById("rAmount").value = "";
+  document.getElementById("rDate").value = todayISO();
+  validateRepayForm();
+  document.getElementById("repayOverlay").classList.add("open");
+  setTimeout(()=>document.getElementById("rAmount").focus(), 50);
+}
+function closeRepayForm(){
+  document.getElementById("repayOverlay").classList.remove("open");
+  repayingLoanId = null;
+}
+function validateRepayForm(){
+  const amt = parseFloat(document.getElementById("rAmount").value);
+  document.getElementById("saveRepayBtn").disabled = !(amt && amt > 0);
+}
+function saveRepayment(){
+  const amt = parseFloat(document.getElementById("rAmount").value);
+  if(!amt || amt <= 0 || !repayingLoanId) return;
+  const loan = loans.find(l=>l.id===repayingLoanId);
+  const rem = loanRemaining(loan);
+  const applied = Math.min(amt, rem);
+  loan.repayments = loan.repayments || [];
+  loan.repayments.push({id: uid(), amount: applied, date: document.getElementById("rDate").value || todayISO()});
+  persistLoans();
+  closeRepayForm();
+  renderAll();
+}
+function settleLoan(loanId){
+  const loan = loans.find(l=>l.id===loanId);
+  const rem = loanRemaining(loan);
+  if(rem <= 0) return;
+  loan.repayments = loan.repayments || [];
+  loan.repayments.push({id: uid(), amount: rem, date: todayISO()});
+  persistLoans();
+  renderAll();
+}
+
+/* ---------- MENU / BACKUP ---------- */
+function openMenu(){ document.getElementById("menuOverlay").classList.add("open"); }
+function closeMenu(){ document.getElementById("menuOverlay").classList.remove("open"); }
+
+function exportBackup(){
+  const data = { exportedAt: new Date().toISOString(), entries, loans };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `khatavahi-backup-${todayISO()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  closeMenu();
+}
+
+function importBackup(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!Array.isArray(data.entries) || !Array.isArray(data.loans)){
+        alert("This file doesn't look like a Khatavahi backup.");
+        return;
+      }
+      const proceed = confirm(`This will replace your current data with the backup from ${data.exportedAt ? formatDateLabel(data.exportedAt.slice(0,10)) : "the file"}. Continue?`);
+      if(!proceed) return;
+      entries = data.entries;
+      loans = data.loans;
+      persistLedger();
+      persistLoans();
+      renderAll();
+      closeMenu();
+    }catch(err){
+      alert("Could not read this backup file.");
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = "";
+}
+
+/* ---------- INSTALL HINT ---------- */
+function showInstallHint(){
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if(isStandalone) return;
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+  const isAndroid = /Android/.test(ua);
+  const banner = document.getElementById("installBanner");
+  const text = document.getElementById("installText");
+  if(isIOS){
+    text.textContent = "Tap Share, then \"Add to Home Screen\" — opens full screen like an app.";
+    banner.classList.add("show");
+  } else if(isAndroid){
+    text.textContent = "Tap the browser menu (⋮), then \"Add to Home screen\" or \"Install app\".";
+    banner.classList.add("show");
+  }
+}
+
+load();
+renderQuickAdds();
+renderAll();
+showInstallHint();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('activate', e => self.clients.claim());
+    self.addEventListener('fetch', e => {
+      e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+</script>
+</body>
+</html>

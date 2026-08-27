@@ -1,0 +1,436 @@
+{
+  "exportedAt": "2026-08-26T17:12:16.388Z",
+  "entries": [
+    {
+      "id": "3e915a8cqzgoj",
+      "createdAt": 1787756108428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Hapta",
+      "amount": 24000,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cec100",
+      "createdAt": 1787756109428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Life Cover",
+      "amount": 2000,
+      "type": "expense"
+    },
+    {
+      "id": "3e9eeec5xjwr7",
+      "createdAt": 1787756998342,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Mitra",
+      "amount": 10000,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c8pb09",
+      "createdAt": 1787756110428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Dudh",
+      "amount": 6496,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8chyidm",
+      "createdAt": 1787756111428,
+      "date": "2026-08-26",
+      "description": "pau ne chatni ne sev ne nan khatai",
+      "category": "Nasto",
+      "amount": 430,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cma9mp",
+      "createdAt": 1787756112428,
+      "date": "2026-08-26",
+      "description": "ghughro",
+      "category": "Nasto",
+      "amount": 500,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c28p70",
+      "createdAt": 1787756113428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Petrol",
+      "amount": 300,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8csk75j",
+      "createdAt": 1787756114428,
+      "date": "2026-08-26",
+      "description": "papa nu",
+      "category": "Recharge",
+      "amount": 1850,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8chgftj",
+      "createdAt": 1787756115428,
+      "date": "2026-08-26",
+      "description": "biscuit kutra na",
+      "category": "Other",
+      "amount": 280,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c4s7j2",
+      "createdAt": 1787756116428,
+      "date": "2026-08-26",
+      "description": "domain lidhu",
+      "category": "Other",
+      "amount": 1080,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cyucbx",
+      "createdAt": 1787756117428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Petrol",
+      "amount": 500,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cc2gno",
+      "createdAt": 1787756118428,
+      "date": "2026-08-26",
+      "description": "zerox document ni",
+      "category": "Other",
+      "amount": 60,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cs7158",
+      "createdAt": 1787756119428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Gold Loan",
+      "amount": 6200,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c9sfjd",
+      "createdAt": 1787756120428,
+      "date": "2026-08-26",
+      "description": "dhana ne bateta",
+      "category": "Other",
+      "amount": 70,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c3wx0a",
+      "createdAt": 1787756121428,
+      "date": "2026-08-26",
+      "description": "tameta ne limboo",
+      "category": "Other",
+      "amount": 50,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cpksbg",
+      "createdAt": 1787756122428,
+      "date": "2026-08-26",
+      "description": "amblas rasta ma",
+      "category": "Nasto",
+      "amount": 200,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c2ibgx",
+      "createdAt": 1787756123428,
+      "date": "2026-08-26",
+      "description": "mudit gift",
+      "category": "Gift",
+      "amount": 200,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cek6ce",
+      "createdAt": 1787756124428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Petrol",
+      "amount": 350,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cb0t3q",
+      "createdAt": 1787756125428,
+      "date": "2026-08-26",
+      "description": "jan aushadhi kendra",
+      "category": "Other",
+      "amount": 50,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cf6bl7",
+      "createdAt": 1787756126428,
+      "date": "2026-08-26",
+      "description": "valuation advance",
+      "category": "Valuation",
+      "amount": 5000,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c7goub",
+      "createdAt": 1787756127428,
+      "date": "2026-08-26",
+      "description": "dudh ne mava",
+      "category": "Dudh",
+      "amount": 145,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cjstxo",
+      "createdAt": 1787756128428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Dudh",
+      "amount": 105,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c3hgrd",
+      "createdAt": 1787756129428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Riksha",
+      "amount": 20,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cyio7p",
+      "createdAt": 1787756130428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Bus",
+      "amount": 180,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cw8awj",
+      "createdAt": 1787756131428,
+      "date": "2026-08-26",
+      "description": "Gondal chowkdi",
+      "category": "Riksha",
+      "amount": 50,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c2mhs7",
+      "createdAt": 1787756132428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Bus",
+      "amount": 180,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cb5j4k",
+      "createdAt": 1787756133428,
+      "date": "2026-08-26",
+      "description": "fai na bus",
+      "category": "Bus",
+      "amount": 75,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cn86hi",
+      "createdAt": 1787756134428,
+      "date": "2026-08-26",
+      "description": "cover",
+      "category": "Life Cover",
+      "amount": 200,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cf2qnm",
+      "createdAt": 1787756135428,
+      "date": "2026-08-26",
+      "description": "puff soda",
+      "category": "Nasto",
+      "amount": 140,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8crr1q0",
+      "createdAt": 1787756136428,
+      "date": "2026-08-26",
+      "description": "shiva ne online",
+      "category": "Other",
+      "amount": 105,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c0glyj",
+      "createdAt": 1787756137428,
+      "date": "2026-08-26",
+      "description": "shiva ne online",
+      "category": "Other",
+      "amount": 50,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cxbwwe",
+      "createdAt": 1787756138428,
+      "date": "2026-08-26",
+      "description": "shiva ne online",
+      "category": "Other",
+      "amount": 150,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cyj9zi",
+      "createdAt": 1787756139428,
+      "date": "2026-08-26",
+      "description": "jiru",
+      "category": "Other",
+      "amount": 75,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c3g6vd",
+      "createdAt": 1787756140428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Dudh",
+      "amount": 105,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cgzfiw",
+      "createdAt": 1787756141428,
+      "date": "2026-08-26",
+      "description": "chocolate pranshi",
+      "category": "Other",
+      "amount": 20,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cp1o6m",
+      "createdAt": 1787756142428,
+      "date": "2026-08-26",
+      "description": "rakhdi na mara ne papa na",
+      "category": "Gift",
+      "amount": 1000,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8c8uub9",
+      "createdAt": 1787756143428,
+      "date": "2026-08-26",
+      "description": "pankho electric charge vado",
+      "category": "Other",
+      "amount": 3163,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8caanwl",
+      "createdAt": 1787756144428,
+      "date": "2026-08-26",
+      "description": "shiva ne didha",
+      "category": "Other",
+      "amount": 1000,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8ci9sh3",
+      "createdAt": 1787756145428,
+      "date": "2026-08-26",
+      "description": "papdi gulab ni",
+      "category": "Other",
+      "amount": 100,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cz0bfe",
+      "createdAt": 1787756146428,
+      "date": "2026-08-26",
+      "description": "Pendrive keshod mokli",
+      "category": "Other",
+      "amount": 50,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8ct4cst",
+      "createdAt": 1787756147428,
+      "date": "2026-08-26",
+      "description": "pestry",
+      "category": "Other",
+      "amount": 80,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8cjppsg",
+      "createdAt": 1787756148428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Dudh",
+      "amount": 105,
+      "type": "expense"
+    },
+    {
+      "id": "3e915a8ch0xh6",
+      "createdAt": 1787756149428,
+      "date": "2026-08-26",
+      "description": "",
+      "category": "Salary",
+      "amount": 50000,
+      "type": "income"
+    },
+    {
+      "id": "3ea4f0600r8ru",
+      "createdAt": 1787757391968,
+      "date": "2026-08-26",
+      "description": "Bhautik ne didha",
+      "category": "Other",
+      "amount": 10000,
+      "type": "expense"
+    }
+  ],
+  "loans": [
+    {
+      "id": "3e915a8f6qpth",
+      "createdAt": 1787756152428,
+      "person": "Friend",
+      "amount": 10000,
+      "direction": "borrowed",
+      "date": "2026-08-26",
+      "note": "Bhautik ne deva mate",
+      "repayments": [],
+      "affectsCash": true
+    },
+    {
+      "id": "3e915a8f0ngym",
+      "createdAt": 1787756153428,
+      "person": "Friend",
+      "amount": 10000,
+      "direction": "borrowed",
+      "date": "2026-08-26",
+      "note": "",
+      "repayments": [],
+      "affectsCash": true
+    },
+    {
+      "id": "3e915a8fpx0dv",
+      "createdAt": 1787756154428,
+      "person": "Friend",
+      "amount": 10000,
+      "direction": "borrowed",
+      "date": "2026-08-26",
+      "note": "gharma ghate to kam aavse",
+      "repayments": [],
+      "affectsCash": true
+    }
+  ]
+}

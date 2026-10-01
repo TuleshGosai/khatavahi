@@ -150,3 +150,66 @@ vadharie.
   safe rakho
 - **⋮ menu → Import backup** — koi bhi backup JSON pacha load karva
   mate, badhu current data replace thai jay (khatri kari ne j karo)
+
+---
+
+## App na niyam (Requirements) — aa pramane kaam karvu joiye
+
+Aa niyam tutvay nahi e dhyan rakhvu. Navu feature umero tyare aa badha same rahevu joiye.
+
+### 1. Ek j sachu hisab: Ledger
+- **Cash in hand = Ledger no Balance** (Income − Expense). Alag ghatadvani ganatri nathi.
+- Je paisa kharekhar haath ma aave ke jay, e badhu ledger ma line tarike lakhay.
+- **Ledger tab:** Balance, In, Out, Loan. **Cash in hand card fakt Loans tab ma.**
+
+### 2. In / Out / Loan
+- **In** = kharekhar kamai (Salary vagere). **Out** = kharekhar kharcho (Hapta, Other vagere).
+- **Loan** loan ni lines nu net chhe (Loan Taken + Loan Return − Loan Given − Loan Repaid).
+- **Balance = In − Out ± Loan.** In/Out ma loan ni lines ganai nathi.
+
+### 3. Loans tab
+Be vibhag, alag alag:
+- **લેવાના (To receive):** je ne tame paisa apya. Koi kyare aapshe e nakki nathi.
+- **દેવાના (You owe):** je pase thi tame paisa lidha.
+
+| Tame su karo | Ledger ma aapoaap shu aave |
+|---|---|
+| Udhar lidha | **Loan Taken** (+, Income) |
+| Udhar apya | **Loan Given** (−, Expense) |
+| Received / Received all (levana pacha aavya) | **Loan Return** (+, Income) |
+| Pay / Settle (devana chukavya) | **Loan Repaid** (−, Expense) |
+
+- Loan ni lines ledger ma **edit na thay**. "Loan Taken" / "Loan Given" ne delete na thay (loan delete karo to e sathe jati rahe).
+- "Loan Return" / "Loan Repaid" line delete karo to e payment loan mathi pan hataai jay ane baki rakam pacho vadhe.
+- **Loan delete karo to teni badhi ledger lines pan sathe jay.**
+- **"Tracked only"** (juna loan, jema aajna paisa nathi aavya): ledger ma kai nathi lakhatu, cash par asar nathi.
+
+### 4. Juna data
+App khule tyare juna loans (jemni ledger line nathi) ni lines automatic bani jay chhe. Cash no aankdo badlato nathi. Update karya pehla **Export backup** karvu.
+
+### 5. Test kem karvu
+Real flow thi check karvo (headless Chrome / Playwright): Salary → kharcho → udhar lidha → udhar apya → Received → Settle. Darek step pachhi ledger In/Out/Loan ane cash tapasvu.
+
+---
+
+## Aagal na improvements (baki)
+
+Aa badha navi branch ma j karvanu, `main` ma nahi (jethi chalti app ne asar na thay).
+
+**Pehla (jarur):**
+1. Ledger ni Balance card ma ek line: *Levana baki · Devana baki*.
+2. Kul sthiti ek line ma: *Haath ma + Levana − Devana*.
+3. Backup nu reminder (7 divas thi backup na hoy to) ane **Export CSV**.
+
+**Pachhi (saru):**
+4. Loan par tap karo to puro itihas (kyare apya, kyare kitla aavya).
+5. Mahina pramane In/Out/Loan (Oct, Sep...).
+6. Loan edit (naam / rakam bhul sudharva).
+7. Delete par confirm / Undo.
+
+**Saaf karva jevu:**
+8. Bhasha ek rakhvi (Gujarati / English / Roman bhegu na hoy).
+9. Vyakti-wise total (ek j vyakti ne ghani vaar apya hoy to).
+10. "Tracked only" checkbox nu naam saral karvu.
+
+**Surksha:** upar na setup ma keystore passwords lakhela chhe. Repo public hoy to e badha joi shake, etle e vaat kadhi nakhvi ke repo private karvu.

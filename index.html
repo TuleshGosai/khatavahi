@@ -180,12 +180,6 @@
   <span id="installText"></span>
 </div>
 
-<section class="summary-card cash-card">
-  <div class="balance-label">Cash in hand</div>
-  <div id="cashValue" class="balance-value mono">₹0</div>
-  <div class="cash-breakdown" id="cashBreakdown"></div>
-</section>
-
 <!-- LEDGER VIEW -->
 <div id="ledgerView">
   <section class="summary-card">
@@ -194,7 +188,9 @@
     <div class="inout-row">
       <div class="inout-item"><div class="dot" style="background:var(--green)"></div><span class="inout-label">In</span><span id="totalIn" class="inout-value mono" style="color:var(--green)">₹0</span></div>
       <div class="inout-item"><div class="dot" style="background:var(--red)"></div><span class="inout-label">Out</span><span id="totalOut" class="inout-value mono" style="color:var(--red)">₹0</span></div>
+      <div class="inout-item"><div class="dot" style="background:var(--gold)"></div><span class="inout-label">Loan</span><span id="totalLoanNet" class="inout-value mono">₹0</span></div>
     </div>
+    <div class="helper-text">Balance = In − Out ± Loan. In/Out ma loan ni entries ganai nathi.</div>
   </section>
 
   <section class="quick-section">
@@ -217,6 +213,12 @@
 
 <!-- LOANS VIEW -->
 <div id="loansView" class="hidden">
+  <section class="summary-card cash-card">
+    <div class="balance-label">Cash in hand</div>
+    <div id="cashValue" class="balance-value mono">₹0</div>
+    <div class="cash-breakdown" id="cashBreakdown"></div>
+  </section>
+
   <section class="summary-card">
     <div class="balance-label">Net loan position</div>
     <div id="loanNetValue" class="balance-value mono">₹0</div>
@@ -228,8 +230,8 @@
 
   <div class="filter-row">
     <button class="filter-chip active" id="fltLoanAll" onclick="setLoanFilter('all')">All</button>
-    <button class="filter-chip f-borrowed" id="fltBorrowed" onclick="setLoanFilter('borrowed')">You owe</button>
-    <button class="filter-chip f-lent" id="fltLent" onclick="setLoanFilter('lent')">Owed to you</button>
+    <button class="filter-chip f-borrowed" id="fltBorrowed" onclick="setLoanFilter('borrowed')">Devana</button>
+    <button class="filter-chip f-lent" id="fltLent" onclick="setLoanFilter('lent')">Levana</button>
   </div>
 
   <div id="loansArea"></div>
@@ -323,7 +325,7 @@
 <div class="overlay" id="repayOverlay" onclick="if(event.target===this) closeRepayForm()">
   <div class="sheet">
     <div class="sheet-header">
-      <span class="sheet-title">Record repayment</span>
+      <span class="sheet-title" id="repaySheetTitle">Record repayment</span>
       <button class="icon-btn-sm" onclick="closeRepayForm()" aria-label="Close">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -367,7 +369,7 @@
 <script>
 const LEDGER_KEY = "khatavahi-entries-v1";
 const LOANS_KEY = "khatavahi-loans-v1";
-const CATEGORY_PRESETS = ["Hapta","Life Cover","Mitra","Dudh","Nasto","Petrol","Recharge","Riksha","Bus","Gold Loan","Valuation","Gift","Salary","Savings","Other"];
+const CATEGORY_PRESETS = ["Hapta","Life Cover","Mitra","Dudh","Nasto","Petrol","Recharge","Riksha","Bus","Gold Loan","Valuation","Gift","Loan Taken","Loan Given","Loan Repaid","Loan Return","Salary","Savings","Other"];
 const QUICK_ADDS = [
   {label:"દૂધ", sub:"Dudh", category:"Dudh", amount:105, type:"expense"},
   {label:"પેટ્રોલ", sub:"Petrol", category:"Petrol", amount:200, type:"expense"},
@@ -465,9 +467,15 @@ function renderQuickAdds(){
   });
 }
 function computeTotals(){
-  let income=0, expense=0;
-  entries.forEach(e=>{ if(e.type==="income") income+=Number(e.amount); else expense+=Number(e.amount); });
-  return {income, expense, balance: income-expense};
+  // income / expense leave loan lines out; loanNet is what loans added to (or took from) the balance.
+  let income=0, expense=0, loanNet=0;
+  entries.forEach(e=>{
+    const amt = Number(e.amount), sign = e.type==="income" ? 1 : -1;
+    if(e.loanId) loanNet += sign*amt;
+    else if(e.type==="income") income += amt;
+    else expense += amt;
+  });
+  return {income, expense, loanNet, balance: income-expense+loanNet};
 }
 function renderSummary(){
   const t = computeTotals();
@@ -476,6 +484,9 @@ function renderSummary(){
   bv.style.color = t.balance < 0 ? "var(--red)" : "var(--ink)";
   document.getElementById("totalIn").textContent = formatINR(t.income);
   document.getElementById("totalOut").textContent = formatINR(t.expense);
+  const ln = document.getElementById("totalLoanNet");
+  ln.textContent = (t.loanNet > 0 ? "+" : "") + formatINR(t.loanNet);
+  ln.style.color = t.loanNet < 0 ? "var(--red)" : t.loanNet > 0 ? "var(--green)" : "var(--ink)";
 }
 function renderLedger(){
   const area = document.getElementById("ledgerArea");
@@ -530,10 +541,10 @@ function renderLedger(){
             <div class="row-balance mono">${formatINR(balanceAfter.get(item.id))}</div>
           </div>
           <div class="row-actions">
-            <button class="icon-btn-sm" onclick="openForm(null,'${item.id}')" aria-label="Edit">
+            ${item.loanId ? "" : `<button class="icon-btn-sm" onclick="openForm(null,'${item.id}')" aria-label="Edit">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-            </button>
-            <button class="icon-btn-sm" onclick="deleteEntry('${item.id}')" aria-label="Delete">
+            </button>`}
+            <button class="icon-btn-sm${item.loanId && !item.repaymentId ? " hidden" : ""}" onclick="deleteEntry('${item.id}')" aria-label="Delete">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             </button>
           </div>
@@ -558,23 +569,21 @@ function computeLoanTotals(){
   });
   return {owe, owed, net: owed-owe};
 }
+// Every loan movement that moves cash is a ledger line, so cash in hand is the ledger balance.
 function computeCashOnHand(){
   const t = computeTotals();
-  let loanEffect = 0;
-  loans.forEach(l=>{
-    if(l.affectsCash === false) return;
-    const rem = loanRemaining(l);
-    loanEffect += (l.direction === "borrowed") ? rem : -rem;
-  });
-  return { total: t.balance + loanEffect, ledgerPart: t.balance, loanPart: loanEffect };
+  return { total: t.balance, ledgerPart: t.balance };
 }
 function renderCashCard(){
   const c = computeCashOnHand();
   const cv = document.getElementById("cashValue");
   cv.textContent = formatINR(c.total);
   cv.style.color = c.total < 0 ? "var(--red)" : "var(--ink)";
-  document.getElementById("cashBreakdown").textContent =
-    `Ledger (income − expense): ${formatINR(c.ledgerPart)}  ·  Loans that added/took cash: ${c.loanPart >= 0 ? "+" : ""}${formatINR(c.loanPart)}`;
+  const lt = computeLoanTotals();
+  document.getElementById("cashBreakdown").innerHTML =
+    `Haath ma = Ledger no balance (In − Out)<br>` +
+    `Levana baki: ${formatINR(lt.owed)} · Devana baki: ${formatINR(lt.owe)}<br>` +
+    `<i>Levana paisa aave tyare "Received" dabavo — e Income tarike ledger ma jashe ane cash vadhshe.</i>`;
 }
 function renderLoanSummary(){
   const t = computeLoanTotals();
@@ -597,8 +606,8 @@ function renderLoans(){
   renderResetControls("resetControlsLoans", confirmingLoanReset, "askResetLoans()", "cancelResetLoans()", "resetLoansAll()", "Reset loans");
 
   const allGroups = [
-    {key:"borrowed", title:"તમે લીધા · You owe", color:"var(--red)"},
-    {key:"lent", title:"તમે આપ્યા · Owed to you", color:"var(--green)"},
+    {key:"lent", title:"લેવાના · To receive", color:"var(--green)"},
+    {key:"borrowed", title:"દેવાના · You owe", color:"var(--red)"},
   ];
   const groups = loanFilter === "all" ? allGroups : allGroups.filter(g=>g.key===loanFilter);
 
@@ -627,8 +636,8 @@ function renderLoans(){
           </div>
           <div class="row-actions">
             ${settled ? "" : `
-              <button class="pill-btn" onclick="openRepayForm('${loan.id}')">Pay</button>
-              <button class="pill-btn settle" onclick="settleLoan('${loan.id}')">Settle</button>
+              <button class="pill-btn" onclick="openRepayForm('${loan.id}')">${loan.direction==="lent" ? "Received" : "Pay"}</button>
+              <button class="pill-btn settle" onclick="settleLoan('${loan.id}')">${loan.direction==="lent" ? "Received all" : "Settle"}</button>
             `}
             <button class="icon-btn-sm" onclick="deleteLoan('${loan.id}')" aria-label="Delete">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
@@ -638,7 +647,7 @@ function renderLoans(){
     });
     html += `</div>`;
   });
-  area.innerHTML = html || `<div class="empty-state">No loans recorded.</div>`;
+  area.innerHTML = html ? `<div class="ledger">${html}</div>` : `<div class="empty-state">No loans recorded.</div>`;
 }
 
 function renderResetControls(elId, confirming, askFn, cancelFn, yesFn, label){
@@ -665,8 +674,28 @@ function askResetLoans(){ confirmingLoanReset = true; renderLoans(); }
 function cancelResetLoans(){ confirmingLoanReset = false; renderLoans(); }
 function resetLoansAll(){ loans = []; persistLoans(); confirmingLoanReset = false; renderAll(); }
 
-function deleteEntry(id){ entries = entries.filter(e=>e.id !== id); persistLedger(); renderAll(); }
-function deleteLoan(id){ loans = loans.filter(l=>l.id !== id); persistLoans(); renderAll(); }
+function deleteEntry(id){
+  const e = entries.find(x=>x.id===id);
+  if(e && e.loanId){
+    if(!e.repaymentId) return; // the loan's opening line is removed by deleting the loan
+    const loan = loans.find(l=>l.id===e.loanId);
+    if(loan){ loan.repayments = (loan.repayments||[]).filter(r=>r.id!==e.repaymentId); persistLoans(); }
+  }
+  entries = entries.filter(x=>x.id !== id);
+  persistLedger();
+  renderAll();
+}
+function deleteLoan(id){
+  const loan = loans.find(l=>l.id === id);
+  // A loan and everything paid on it cancel out in the ledger, so remove them together.
+  if(loan){
+    entries = entries.filter(e=>e.loanId !== id);
+    persistLedger();
+  }
+  loans = loans.filter(l=>l.id !== id);
+  persistLoans();
+  renderAll();
+}
 
 function renderAll(){
   renderSummary();
@@ -799,6 +828,11 @@ function saveLoanDraft(){
     affectsCash: document.getElementById("lAffectsCash").checked,
     repayments: [],
   };
+  if(loan.affectsCash){
+    const borrowed = loan.direction === "borrowed";
+    loan.entryId = makeLoanEntry(loan, borrowed ? "income" : "expense", borrowed ? "Loan Taken" : "Loan Given", amt, loan.date).id;
+    persistLedger();
+  }
   loans.push(loan);
   persistLoans();
   closeLoanForm();
@@ -806,11 +840,49 @@ function saveLoanDraft(){
 }
 
 /* ---------- REPAYMENT FORM ---------- */
+// Every loan movement that really moves cash gets a ledger line (marked with loanId),
+// so the ledger In/Out always matches reality.
+function makeLoanEntry(loan, type, category, amount, date, repaymentId){
+  const entry = {id: uid(), createdAt: Date.now(), date, description: loan.person,
+    category, amount, type, loanId: loan.id};
+  if(repaymentId) entry.repaymentId = repaymentId;
+  entries.push(entry);
+  return entry;
+}
+function addRepayment(loan, amount, date){
+  loan.repayments = loan.repayments || [];
+  const repayment = {id: uid(), amount, date};
+  if(loan.direction === "lent"){
+    repayment.entryId = makeLoanEntry(loan, "income", "Loan Return", amount, date, repayment.id).id;
+  } else if(loan.affectsCash !== false){
+    repayment.entryId = makeLoanEntry(loan, "expense", "Loan Repaid", amount, date, repayment.id).id;
+  }
+  persistLedger();
+  loan.repayments.push(repayment);
+}
+// Older loans were counted in cash outside the ledger. Give them ledger lines once;
+// the total cash stays exactly the same.
+function migrateLoans(){
+  let changed = false;
+  loans.forEach(l=>{
+    if(l.affectsCash === false || l.entryId) return;
+    const borrowed = l.direction === "borrowed";
+    l.entryId = makeLoanEntry(l, borrowed ? "income" : "expense", borrowed ? "Loan Taken" : "Loan Given", Number(l.amount), l.date).id;
+    (l.repayments||[]).forEach(r=>{
+      if(!r.entryId) r.entryId = makeLoanEntry(l, borrowed ? "expense" : "income", borrowed ? "Loan Repaid" : "Loan Return", Number(r.amount), r.date, r.id).id;
+    });
+    changed = true;
+  });
+  if(changed){ persistLedger(); persistLoans(); }
+}
 function openRepayForm(loanId){
   repayingLoanId = loanId;
   const loan = loans.find(l=>l.id===loanId);
   const rem = loanRemaining(loan);
-  document.getElementById("repayRemainingText").textContent = `${loan.person} · remaining ${formatINR(rem)}`;
+  const isLent = loan.direction === "lent";
+  document.getElementById("repaySheetTitle").textContent = isLent ? "Paisa aavya (Received)" : "Record repayment";
+  document.getElementById("repayRemainingText").textContent =
+    `${loan.person} · remaining ${formatINR(rem)}` + (isLent ? " · will be added to ledger as Income" : "");
   document.getElementById("rAmount").value = "";
   document.getElementById("rDate").value = todayISO();
   validateRepayForm();
@@ -831,8 +903,7 @@ function saveRepayment(){
   const loan = loans.find(l=>l.id===repayingLoanId);
   const rem = loanRemaining(loan);
   const applied = Math.min(amt, rem);
-  loan.repayments = loan.repayments || [];
-  loan.repayments.push({id: uid(), amount: applied, date: document.getElementById("rDate").value || todayISO()});
+  addRepayment(loan, applied, document.getElementById("rDate").value || todayISO());
   persistLoans();
   closeRepayForm();
   renderAll();
@@ -841,8 +912,7 @@ function settleLoan(loanId){
   const loan = loans.find(l=>l.id===loanId);
   const rem = loanRemaining(loan);
   if(rem <= 0) return;
-  loan.repayments = loan.repayments || [];
-  loan.repayments.push({id: uid(), amount: rem, date: todayISO()});
+  addRepayment(loan, rem, todayISO());
   persistLoans();
   renderAll();
 }
@@ -880,6 +950,7 @@ function importBackup(event){
       if(!proceed) return;
       entries = data.entries;
       loans = data.loans;
+      migrateLoans();
       persistLedger();
       persistLoans();
       renderAll();
@@ -911,6 +982,7 @@ function showInstallHint(){
 }
 
 load();
+migrateLoans();
 renderQuickAdds();
 renderAll();
 showInstallHint();

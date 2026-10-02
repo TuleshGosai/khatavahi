@@ -94,9 +94,9 @@ Android unsigned APK direct install nathi thato, etle sign karvu padyu:
 1. Play Store thi **"APK Signer"** (RUBRIKPULSA SOFTWARE) app install karyu
 2. **Keystores** → navi keystore banavi:
    - Keystore Name: `khatavahi`
-   - Password: `khatavahi123`
+   - Password: (potano; password manager ma sachavo — aa file ma nahi)
    - Alias: `khatavahi`
-   - Alias Password: `khatavahi123`
+   - Alias Password: (potano; password manager ma sachavo — aa file ma nahi)
 3. **Sign APK/AAB** → downloaded unsigned APK select karyu
 4. Keystore select kari, password nakhi, **Sign Now**
 5. Navi **signed APK** file malshe (same folder ma)
@@ -118,9 +118,9 @@ Android unsigned APK direct install nathi thato, etle sign karvu padyu:
 | Live link | `https://tuleshgosai.github.io/khatavahi/` |
 | Package ID | `io.github.tuleshgosai.twa` |
 | Keystore file name | `khatavahi` |
-| Keystore password | `khatavahi123` |
+| Keystore password | (password manager ma — aa file ma nahi) |
 | Key alias | `khatavahi` |
-| Alias password | `khatavahi123` |
+| Alias password | (password manager ma — aa file ma nahi) |
 
 ⚠️ **Aa keystore password sachavi rakho.** Jo future ma kadi navi APK
 sign karvi padi (naam/icon badalva mate), to same keystore use karvi
